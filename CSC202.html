@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSC 202 Flashcards — Data Science</title>
+<style>
+  :root{
+    --bg:#0b0e14;
+    --panel:#131722;
+    --panel2:#1a2030;
+    --border:#2a3145;
+    --text:#e8ecf5;
+    --muted:#8b93a7;
+    --accent:#5ec8b8;
+    --accent2:#e0a458;
+    --danger:#e0725f;
+    --good:#6fd08c;
+    --shadow: 0 20px 50px rgba(0,0,0,.45);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(circle at 15% 10%, rgba(94,200,184,.08), transparent 40%),
+      radial-gradient(circle at 85% 90%, rgba(224,164,88,.06), transparent 45%),
+      var(--bg);
+    color:var(--text);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:24px 16px 60px;
+  }
+  header{
+    width:100%;
+    max-width:720px;
+    text-align:center;
+    margin-bottom:18px;
+  }
+  header h1{
+    font-size:1.5rem;
+    margin:0 0 4px;
+    letter-spacing:.3px;
+  }
+  header .sub{
+    color:var(--muted);
+    font-size:.85rem;
+  }
+  .controls{
+    width:100%;
+    max-width:720px;
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:16px;
+    justify-content:center;
+  }
+  select, button{
+    background:var(--panel2);
+    color:var(--text);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:8px 12px;
+    font-size:.85rem;
+    cursor:pointer;
+    transition:.15s;
+  }
+  select:hover, button:hover{border-color:var(--accent);}
+  button.primary{background:var(--accent);color:#04231d;font-weight:600;border:none;}
+  button.primary:hover{filter:brightness(1.08);}
+  .stats{
+    width:100%;
+    max-width:720px;
+    display:flex;
+    justify-content:space-between;
+    font-size:.78rem;
+    color:var(--muted);
+    margin-bottom:8px;
+    padding:0 4px;
+  }
+  .progress-bar{
+    width:100%;
+    max-width:720px;
+    height:6px;
+    background:var(--panel2);
+    border-radius:4px;
+    overflow:hidden;
+    margin-bottom:20px;
+  }
+  .progress-fill{
+    height:100%;
+    background:linear-gradient(90deg, var(--accent), var(--accent2));
+    width:0%;
+    transition:width .3s;
+  }
+  .card-wrap{
+    width:100%;
+    max-width:720px;
+    perspective:1600px;
+    margin-bottom:18px;
+  }
+  .card{
+    position:relative;
+    width:100%;
+    min-height:320px;
+    transform-style:preserve-3d;
+    transition:transform .5s cubic-bezier(.4,.2,.2,1);
+    cursor:pointer;
+  }
+  .card.flipped{transform:rotateY(180deg);}
+  .face{
+    position:absolute;
+    inset:0;
+    backface-visibility:hidden;
+    border-radius:18px;
+    border:1px solid var(--border);
+    box-shadow:var(--shadow);
+    padding:28px;
+    display:flex;
+    flex-direction:column;
+  }
+  .front{
+    background:linear-gradient(160deg, var(--panel), var(--panel2));
+  }
+  .back{
+    background:linear-gradient(160deg, #142320, #101a2b);
+    transform:rotateY(180deg);
+    border-color:rgba(94,200,184,.35);
+  }
+  .tag{
+    display:inline-block;
+    align-self:flex-start;
+    font-size:.68rem;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--accent2);
+    background:rgba(224,164,88,.12);
+    border:1px solid rgba(224,164,88,.3);
+    padding:3px 9px;
+    border-radius:20px;
+    margin-bottom:16px;
+  }
+  .face .label{
+    font-size:.72rem;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:.1em;
+    margin-bottom:10px;
+  }
+  .face .content{
+    flex:1;
+    display:flex;
+    align-items:center;
+    font-size:1.15rem;
+    line-height:1.5;
+  }
+  .back .content{
+    font-size:1.02rem;
+    color:#dfece8;
+  }
+  .hint{
+    text-align:center;
+    color:var(--muted);
+    font-size:.72rem;
+    margin-top:10px;
+  }
+  .nav-row{
+    width:100%;
+    max-width:720px;
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    margin-bottom:10px;
+  }
+  .nav-row button{flex:1;max-width:160px;}
+  .rating-row{
+    width:100%;
+    max-width:720px;
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    margin-top:6px;
+  }
+  .rating-row button{flex:1;max-width:220px;font-weight:600;}
+  #knowBtn{background:rgba(111,208,140,.15);border-color:var(--good);color:var(--good);}
+  #reviewBtn{background:rgba(224,114,95,.15);border-color:var(--danger);color:var(--danger);}
+  footer{
+    margin-top:26px;
+    color:var(--muted);
+    font-size:.72rem;
+    text-align:center;
+  }
+  @media (max-width:480px){
+    .card{min-height:360px;}
+    .face{padding:20px;}
+    .face .content{font-size:1.02rem;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🗂️ CSC 202 Flashcards</h1>
+  <div class="sub">Introduction to Data Science — Weeks 1–2, Lessons 3–7</div>
+</header>
+
+<div class="controls">
+  <select id="deckSelect"></select>
+  <button id="shuffleBtn">🔀 Shuffle</button>
+  <button id="resetBtn">↺ Reset Progress</button>
+</div>
+
+<div class="stats">
+  <span id="counter">Card 1 / 1</span>
+  <span id="knownCount">Known: 0</span>
+</div>
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+<div class="card-wrap">
+  <div class="card" id="card">
+    <div class="face front">
+      <span class="tag" id="tagFront">Lesson</span>
+      <div class="label">Question</div>
+      <div class="content" id="frontText"></div>
+    </div>
+    <div class="face back">
+      <span class="tag" id="tagBack">Lesson</span>
+      <div class="label">Answer</div>
+      <div class="content" id="backText"></div>
+    </div>
+  </div>
+</div>
+<div class="hint">Tap the card to flip</div>
+
+<div class="rating-row">
+  <button id="reviewBtn">✗ Still learning</button>
+  <button id="knowBtn">✓ I know this</button>
+</div>
+
+<div class="nav-row">
+  <button id="prevBtn">← Prev</button>
+  <button id="nextBtn" class="primary">Next →</button>
+</div>
+
+<footer>Built from your CSC 202 exam study guide · Good luck on July 21 🎓</footer>
+
+<script>
+const cards = [
+  // WEEK 1
+  {tag:"Wk1", q:"What is 'Data'?", a:"Raw, unprocessed facts, figures, observations, or symbols — not meaningful until processed/analyzed."},
+  {tag:"Wk1", q:"Define Data Science.", a:"An interdisciplinary field using scientific methods, algorithms, and systems to extract knowledge/insight from structured and unstructured data — 'the art and science of turning data into actionable insight.'"},
+  {tag:"Wk1", q:"What is 'The Data Deluge'?", a:"The explosion of data — ~120+ zettabytes generated globally in 2023, more than in all prior human history combined."},
+  {tag:"Wk1", q:"Name the 3 pillars of the Data Scientist's Toolkit.", a:"Maths & Statistics, Computer Science, and Domain Expertise."},
+  {tag:"Wk1", q:"What does the 'Domain Expertise' pillar provide?", a:"Understanding of context — what questions matter and how to interpret results."},
+  {tag:"Wk1", q:"List the 7 steps of the Data Science Lifecycle in order.", a:"1) Understand the Problem 2) Data Acquisition 3) Data Preparation & Cleaning 4) EDA 5) Modeling/Analysis 6) Evaluation 7) Communication & Deployment."},
+  {tag:"Wk1", q:"What did Einstein say about problems?", a:"'The formulation of a problem is often more essential than its solution.'"},
+  {tag:"Wk1", q:"Turn this vague question into a good one: 'How can we improve student success?'", a:"'Is there a correlation between 100-level attendance and first-year CGPA?' — specific and measurable."},
+  {tag:"Wk1", q:"What are the criteria of a 'good' data science question?", a:"Specific, Measurable, Relevant/Actionable, Realistic, (Timebound)."},
+  {tag:"Wk1", q:"How does data-driven decision making differ from gut-feeling decisions?", a:"It offers objectivity, spotting trends, better prediction, efficient resource use, and measurable impact."},
+
+  // WEEK 2
+  {tag:"Wk2", q:"What does GIGO stand for and mean?", a:"Garbage In, Garbage Out — poor quality input data ruins any analysis."},
+  {tag:"Wk2", q:"Which lifecycle step is 'Data Acquisition'?", a:"Step 2 of the Data Science Lifecycle."},
+  {tag:"Wk2", q:"Define Primary Data vs Secondary Data.", a:"Primary: collected firsthand for your specific purpose (e.g. your own survey). Secondary: collected previously by someone else and reused (e.g. NBS stats, Kaggle)."},
+  {tag:"Wk2", q:"Give the pros/cons of Primary vs Secondary data.", a:"Primary: specific & controlled quality, but time-consuming/expensive. Secondary: quick/cheap/large-scale, but may not fit needs and quality is uncertain."},
+  {tag:"Wk2", q:"Compare Structured, Semi-Structured, and Unstructured data formats.", a:"Structured: highly organized/tabular (SQL, CSV). Semi-Structured: some organization via tags (JSON, XML, HTML). Unstructured: no predefined format (text, images, video) — represents 80%+ of data today."},
+  {tag:"Wk2", q:"List the 7 methods of data collection.", a:"Surveys/Questionnaires, Observation, Experiments, Sensors & Logging (IoT), Existing Datasets, APIs, Web Scraping."},
+  {tag:"Wk2", q:"Why are Experiments the 'gold standard' for cause-effect?", a:"Because they manipulate an independent variable and measure the effect on a dependent variable (e.g. A/B testing, clinical trials)."},
+  {tag:"Wk2", q:"What should you check before web scraping?", a:"robots.txt and the site's terms of service — legal/ethical concerns since no API exists for that route."},
+  {tag:"Wk2", q:"Differentiate Nominal and Ordinal data.", a:"Nominal: categories with no order (eye color, nationality). Ordinal: categories with order but unequal/undefined intervals (education level, rating scale)."},
+  {tag:"Wk2", q:"Differentiate Interval and Ratio data.", a:"Interval: ordered, equal intervals, no true zero, ratios meaningless (temperature °C). Ratio: ordered, equal intervals, true zero, ratios meaningful (height, weight, salary)."},
+  {tag:"Wk2", q:"What does NOIR stand for and what's the rule about it?", a:"Nominal → Ordinal → Interval → Ratio. Each level inherits the properties of the one before it; Ratio is most informative. Higher-level data can use lower-level methods, but not vice versa."},
+  {tag:"Wk2", q:"Classify: Matric Number, Final Grade (A–F), Test Score, Temp in °C.", a:"Matric Number = Nominal; Final Grade = Ordinal; Test Score = Ratio; Temp in °C = Interval."},
+
+  // LESSON 3
+  {tag:"L3", q:"Name the 3 core data quality issues.", a:"Errors, Missing Values, Outliers."},
+  {tag:"L3", q:"What percentage of time do data scientists typically spend cleaning data?", a:"60–80% of their time."},
+  {tag:"L3", q:"Give 3 sub-types of Errors in data.", a:"Typographical (e.g. 'Jonh', age '220'), Measurement (faulty sensor/scale), Sampling (unrepresentative sample)."},
+  {tag:"L3", q:"What is the golden rule about outliers?", a:"Always investigate — never delete outliers automatically!"},
+  {tag:"L3", q:"Define Population vs Sample.", a:"Population: the entire group you want to draw conclusions about. Sample: a subset selected for analysis."},
+  {tag:"L3", q:"Why do we sample instead of studying the whole population?", a:"Cost reduction, time savings, feasibility (some tests are destructive), and sometimes better accuracy via focused effort."},
+  {tag:"L3", q:"Compare Simple Random Sampling (SRS) and Stratified Sampling.", a:"SRS: number the whole population, randomly select — equal chance for all, but may miss small subgroups. Stratified: divide into subgroups (strata) then sample within each — more representative, but needs prior knowledge of the population."},
+  {tag:"L3", q:"List the 6 factors for assessing data appropriateness.", a:"Relevance, Timeliness, Granularity, Bias, Sufficiency, Ethics."},
+  {tag:"L3", q:"A WhatsApp-promoted cafeteria survey — what sampling bias does this represent?", a:"Convenience/Voluntary Response Sampling — likely NOT representative, biased toward active SU members and motivated respondents."},
+
+  // LESSON 4
+  {tag:"L4", q:"What are the two main strategies for handling missing values?", a:"1) Deletion (Listwise or Pairwise) 2) Imputation (Mean, Median, Mode, or Placeholder/Constant)."},
+  {tag:"L4", q:"When is deletion the best strategy for missing data?", a:"When the missing data is small (~5–10%) and random."},
+  {tag:"L4", q:"Differentiate Listwise vs Pairwise deletion.", a:"Listwise: delete the entire row if ANY value is missing (simple, but can shrink sample a lot). Pairwise: for a given analysis, use only the rows where the needed variables are present (uses more data, but creates inconsistent subsets)."},
+  {tag:"L4", q:"When should you use Mean vs Median vs Mode imputation?", a:"Mean: numerical, symmetric data. Median: numerical/ordinal, robust to outliers. Mode: categorical data."},
+  {tag:"L4", q:"What is a good practice to preserve information when imputing?", a:"Create an indicator column flagging which values were originally missing (e.g. Age_WasMissing = T/F)."},
+  {tag:"L4", q:"What is the first critical step when handling an outlier?", a:"Investigate — determine if it's an error (correct/remove) or a genuine extreme value (be careful about removing it)."},
+  {tag:"L4", q:"Name 3 techniques for handling outliers (beyond deletion).", a:"Deletion/Trimming, Capping/Winsorization (replace with max/min threshold), Transformation (e.g. apply log function)."},
+  {tag:"L4", q:"What is Winsorization/Capping?", a:"Replacing an outlier with a maximum/minimum threshold value instead of deleting it — keeps the observation, limits its influence, but the threshold choice can be arbitrary."},
+  {tag:"L4", q:"State the 3 Tidy Data principles (Hadley Wickham).", a:"1) Each variable has its own column. 2) Each observation has its own row. 3) Each value has its own cell."},
+  {tag:"L4", q:"List the 5 Data Validation Rule types with an example each.", a:"Range Check (age 0–120), Data Type Check (Matric No. alphanumeric), Format Check (email has '@'), Consistency Check (if Single, Spouse Name empty), Uniqueness Check (matric numbers unique)."},
+
+  // LESSON 5
+  {tag:"L5", q:"Who pioneered EDA and what is the philosophy?", a:"John Tukey. Philosophy: understand data before modeling, let data 'speak for itself,' generate hypotheses rather than just confirm them."},
+  {tag:"L5", q:"Name the two categories of descriptive statistics.", a:"Measures of Central Tendency (where is the center?) and Measures of Spread/Dispersion (how variable is the data?)."},
+  {tag:"L5", q:"Compare Mean, Median, and Mode: sensitivity to outliers & best use.", a:"Mean: high sensitivity, best for symmetric numerical data. Median: low sensitivity (robust), best for skewed/outlier data & ordinal data. Mode: low sensitivity, best for categorical/nominal data."},
+  {tag:"L5", q:"In a right-skewed distribution, how do Mean, Median, and Mode relate?", a:"Mode < Median < Mean."},
+  {tag:"L5", q:"In a left-skewed distribution, how do Mean, Median, and Mode relate?", a:"Mean < Median < Mode."},
+  {tag:"L5", q:"Why isn't central tendency alone enough to describe data?", a:"Two datasets can share the same mean/median but have very different spread (e.g. [70,70,70,70,70] vs [50,60,70,80,90], both mean=70)."},
+  {tag:"L5", q:"Define Range, Variance, Standard Deviation, and IQR.", a:"Range = Max−Min (crude). Variance = avg of squared differences from mean (units squared). Std Dev = √Variance (same units as data). IQR = Q3−Q1 (robust, spread of middle 50%)."},
+  {tag:"L5", q:"Which measures of spread are robust vs sensitive to outliers?", a:"IQR is robust to outliers. Range, Variance, and Standard Deviation are all sensitive to outliers."},
+  {tag:"L5", q:"For the dataset [50,60,70,80,90], calculate Q1, Q2 (median), Q3, and IQR.", a:"Q2 (median) = 70; Q1 = (50+60)/2 = 55; Q3 = (80+90)/2 = 85; IQR = Q3−Q1 = 30."},
+  {tag:"L5", q:"What's the difference between a frequency table and how numerical data is binned for a distribution?", a:"Categorical data → frequency table (category, count, %). Numerical data → must be grouped into intervals (binning), forming the basis for histograms."},
+
+  // LESSON 6
+  {tag:"L6", q:"List the reasons computational tools are preferred over manual analysis.", a:"Efficiency & speed, scalability, accuracy (fewer human errors), reproducibility, enable advanced techniques (ML), and data integration."},
+  {tag:"L6", q:"What are the strengths and weaknesses of Spreadsheets as a tool?", a:"Strengths: visual/intuitive (WYSIWYG), low barrier to entry, good for small data. Weaknesses: scalability limits, poor reproducibility, limited advanced analysis, hard to collaborate."},
+  {tag:"L6", q:"Compare Python and R as programming environments for data science.", a:"Python: general-purpose, strong ML/web integration, large community (Anaconda, Jupyter). R: purpose-built for statistics, huge package ecosystem, academia/research standard (RStudio, Tidyverse)."},
+  {tag:"L6", q:"Name key Python libraries for data science and their purpose.", a:"NumPy (numerical computing/arrays), Pandas (DataFrames), Matplotlib/Seaborn (visualization), Scikit-learn (Machine Learning)."},
+  {tag:"L6", q:"Name key R packages for data science and their purpose.", a:"dplyr (data manipulation), ggplot2 (visualization), readr (reading files), plus Base R."},
+  {tag:"L6", q:"What is the Python term and R term for a 2D table structure?", a:"Python: Pandas DataFrame. R: data.frame / tibble."},
+  {tag:"L6", q:"In a DataFrame, what do rows and columns represent?", a:"Rows = Observations; Columns = Variables/Features."},
+  {tag:"L6", q:"When should you move from spreadsheets to programming languages?", a:"When the dataset is too large, you need complex/custom algorithms, need a reproducible workflow, need to automate cleaning, or need to integrate with databases/APIs."},
+
+  // LESSON 7
+  {tag:"L7", q:"What is Anscombe's Quartet and what does it teach us?", a:"Four datasets with nearly identical mean, variance, correlation, and regression line — but they look completely different when plotted. Lesson: always visualize your data; summary stats alone can deceive."},
+  {tag:"L7", q:"Name the 3 core principles of effective data visualization.", a:"1) Clarity, Purpose, Audience 2) Integrity & Avoiding Misinformation 3) Design for Clarity."},
+  {tag:"L7", q:"What does 'Integrity' in visualization require?", a:"Use appropriate scales (start bar charts at zero), avoid distortion (no manipulated aspect ratios/misleading 3D), provide context, and cite sources — never mislead the viewer."},
+  {tag:"L7", q:"What is Tufte's 'data-ink ratio'?", a:"A concept for minimizing non-informative/unnecessary chart decoration ('chart junk') to maximize clarity."},
+  {tag:"L7", q:"When would you use a Bar Chart vs a Histogram vs a Pie Chart?", a:"Bar Chart: qualitative data, compare frequency across categories. Histogram: quantitative data, show frequency distribution. Pie Chart: qualitative data with few categories, show proportion of a whole (use with caution)."},
+  {tag:"L7", q:"What is the key structural difference between a Bar Chart and a Histogram?", a:"Bar Chart: categorical x-axis, one bar per category, gaps between bars. Histogram: numerical x-axis (continuous bins), one bar per bin, no gaps — bars touch."},
+  {tag:"L7", q:"Why is a Pie Chart risky even though it shows proportions?", a:"Humans are bad at judging angle/area, making it hard to accurately compare slices — best used only with few categories."},
+  {tag:"L7", q:"Classify the chart type for: Faculty, Age (years), CSC101 Exam Score (0–100).", a:"Faculty → Bar Chart; Age (years) → Histogram; CSC101 Exam Score → Histogram."},
+
+  // HIGH-YIELD / CROSS-LESSON
+  {tag:"Key", q:"How does NOIR determine valid statistics?", a:"Nominal/Ordinal → Mode (+Median for Ordinal). Interval/Ratio → Mean, Median, and Mode are all valid. It also determines imputation choice (Mean/Median for numerical, Mode for categorical)."},
+  {tag:"Key", q:"Why are Median/IQR preferred over Mean/Range for skewed data with outliers?", a:"Because Median and IQR are robust (resistant) to outliers, while Mean, Range, and Standard Deviation are all heavily distorted by extreme values."},
+  {tag:"Key", q:"How does Tidy Data connect to Lessons 6 and 7?", a:"Tidy Data (one variable/column, one observation/row, one value/cell) is the structural foundation for the DataFrame (Lesson 6) and enables clean, reliable plotting (Lesson 7)."},
+  {tag:"Key", q:"Define SRS, IQR, and EDA (acronyms).", a:"SRS = Simple Random Sampling. IQR = Interquartile Range (Q3−Q1). EDA = Exploratory Data Analysis (pioneered by Tukey)."},
+];
+
+let order = cards.map((_,i)=>i);
+let idx = 0;
+let known = new Set();
+let flipped = false;
+
+const cardEl = document.getElementById('card');
+const frontText = document.getElementById('frontText');
+const backText = document.getElementById('backText');
+const tagFront = document.getElementById('tagFront');
+const tagBack = document.getElementById('tagBack');
+const counter = document.getElementById('counter');
+const knownCount = document.getElementById('knownCount');
+const progressFill = document.getElementById('progressFill');
+const deckSelect = document.getElementById('deckSelect');
+
+const tagNames = {"Wk1":"Week 1","Wk2":"Week 2","L3":"Lesson 3","L4":"Lesson 4","L5":"Lesson 5","L6":"Lesson 6","L7":"Lesson 7","Key":"High-Yield"};
+const tagSet = ["All", ...Object.keys(tagNames)];
+deckSelect.innerHTML = tagSet.map(t => `<option value="${t}">${t==="All"?"All Lessons":tagNames[t]}</option>`).join('');
+
+function currentPool(){
+  const filter = deckSelect.value;
+  return order.filter(i => filter==="All" || cards[i].tag===filter);
+}
+
+let pool = currentPool();
+
+function render(){
+  pool = currentPool();
+  if(pool.length===0){ pool=[0]; }
+  if(idx >= pool.length) idx = 0;
+  const c = cards[pool[idx]];
+  frontText.textContent = c.q;
+  backText.textContent = c.a;
+  tagFront.textContent = tagNames[c.tag];
+  tagBack.textContent = tagNames[c.tag];
+  counter.textContent = `Card ${idx+1} / ${pool.length}`;
+  knownCount.textContent = `Known: ${known.size} / ${cards.length}`;
+  progressFill.style.width = `${(known.size/cards.length)*100}%`;
+  cardEl.classList.remove('flipped');
+  flipped = false;
+}
+
+cardEl.addEventListener('click', ()=>{
+  flipped = !flipped;
+  cardEl.classList.toggle('flipped', flipped);
+});
+
+document.getElementById('nextBtn').addEventListener('click', ()=>{
+  idx = (idx+1) % pool.length;
+  render();
+});
+document.getElementById('prevBtn').addEventListener('click', ()=>{
+  idx = (idx-1+pool.length) % pool.length;
+  render();
+});
+document.getElementById('shuffleBtn').addEventListener('click', ()=>{
+  order.sort(()=>Math.random()-0.5);
+  idx = 0;
+  render();
+});
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  known.clear();
+  idx = 0;
+  render();
+});
+document.getElementById('knowBtn').addEventListener('click', ()=>{
+  known.add(pool[idx]);
+  idx = (idx+1) % pool.length;
+  render();
+});
+document.getElementById('reviewBtn').addEventListener('click', ()=>{
+  known.delete(pool[idx]);
+  idx = (idx+1) % pool.length;
+  render();
+});
+deckSelect.addEventListener('change', ()=>{
+  idx = 0;
+  render();
+});
+
+document.addEventListener('keydown', (e)=>{
+  if(e.code==='Space'){ e.preventDefault(); cardEl.click(); }
+  if(e.code==='ArrowRight'){ document.getElementById('nextBtn').click(); }
+  if(e.code==='ArrowLeft'){ document.getElementById('prevBtn').click(); }
+});
+
+render();
+</script>
+</body>
+</html>
