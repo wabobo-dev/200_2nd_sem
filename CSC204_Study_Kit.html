@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSC 204 — Big Data Computing & Security | Study Kit</title>
+<style>
+  :root{
+    --bg:#0b0f14;
+    --bg2:#111820;
+    --panel:#141c26;
+    --panel2:#182230;
+    --border:#22303f;
+    --text:#e7edf3;
+    --muted:#8ea3b8;
+    --accent:#2dd4bf;
+    --accent2:#f0b429;
+    --danger:#ef5b5b;
+    --good:#4ade80;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:radial-gradient(circle at 20% -10%, #163040 0%, var(--bg) 45%), var(--bg);
+    color:var(--text);
+    font-family:'Segoe UI', system-ui, -apple-system, sans-serif;
+    line-height:1.5;
+    padding-bottom:60px;
+  }
+  header{
+    padding:28px 20px 18px;
+    text-align:center;
+    border-bottom:1px solid var(--border);
+    background:linear-gradient(180deg, rgba(45,212,191,0.08), transparent);
+  }
+  header .tag{
+    display:inline-block;
+    font-size:12px;
+    letter-spacing:2px;
+    color:var(--accent);
+    text-transform:uppercase;
+    margin-bottom:8px;
+  }
+  header h1{
+    margin:0;
+    font-size:clamp(22px, 4vw, 32px);
+  }
+  header p{
+    color:var(--muted);
+    margin:8px 0 0;
+    font-size:14px;
+  }
+  nav{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    justify-content:center;
+    padding:16px 12px;
+    position:sticky;
+    top:0;
+    background:rgba(11,15,20,0.92);
+    backdrop-filter:blur(6px);
+    z-index:10;
+    border-bottom:1px solid var(--border);
+  }
+  nav button{
+    background:var(--panel);
+    border:1px solid var(--border);
+    color:var(--muted);
+    padding:10px 18px;
+    border-radius:999px;
+    font-size:13px;
+    cursor:pointer;
+    transition:.15s;
+    font-weight:600;
+  }
+  nav button:hover{ color:var(--text); border-color:var(--accent); }
+  nav button.active{
+    background:var(--accent);
+    color:#04211d;
+    border-color:var(--accent);
+  }
+  main{ max-width:920px; margin:0 auto; padding:20px 16px; }
+  section{ display:none; }
+  section.active{ display:block; animation:fade .25s ease; }
+  @keyframes fade{ from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);} }
+
+  .unit-card{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    margin-bottom:16px;
+    overflow:hidden;
+  }
+  .unit-head{
+    padding:16px 18px;
+    cursor:pointer;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:var(--panel2);
+  }
+  .unit-head h3{ margin:0; font-size:16px; color:var(--accent); }
+  .unit-head .chev{ transition:.2s; color:var(--muted); }
+  .unit-card.open .chev{ transform:rotate(180deg); }
+  .unit-body{
+    max-height:0;
+    overflow:hidden;
+    transition:max-height .3s ease;
+    padding:0 18px;
+  }
+  .unit-card.open .unit-body{ padding:14px 18px 18px; max-height:4000px; }
+  .unit-body h4{ color:var(--accent2); margin:16px 0 6px; font-size:14px; }
+  .unit-body h4:first-child{ margin-top:0; }
+  .unit-body p, .unit-body li{ color:#c8d5e0; font-size:14.5px; }
+  .unit-body ul{ margin:6px 0; padding-left:20px; }
+  .pill-row{ display:flex; flex-wrap:wrap; gap:6px; margin:6px 0 12px; }
+  .pill{
+    background:rgba(45,212,191,0.12);
+    border:1px solid rgba(45,212,191,0.35);
+    color:var(--accent);
+    font-size:12px;
+    padding:3px 10px;
+    border-radius:999px;
+  }
+  table{ width:100%; border-collapse:collapse; margin:10px 0; font-size:13.5px; }
+  th, td{ border:1px solid var(--border); padding:6px 8px; text-align:left; color:#c8d5e0; }
+  th{ background:var(--panel2); color:var(--accent); }
+  code{ background:#0d1620; padding:1px 6px; border-radius:5px; color:#7dd3fc; font-size:13px; }
+
+  /* Flashcards */
+  .fc-wrap{ text-align:center; }
+  .fc-progress{ color:var(--muted); font-size:13px; margin-bottom:14px; }
+  .flashcard{
+    background:linear-gradient(160deg, var(--panel2), var(--panel));
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    min-height:220px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:30px 24px;
+    cursor:pointer;
+    font-size:17px;
+    position:relative;
+    user-select:none;
+  }
+  .flashcard .face-label{
+    position:absolute;
+    top:12px;
+    left:16px;
+    font-size:11px;
+    letter-spacing:1.5px;
+    color:var(--muted);
+    text-transform:uppercase;
+  }
+  .flashcard.answer{ border-color:var(--accent); }
+  .fc-controls{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin-top:16px;
+    flex-wrap:wrap;
+  }
+  .fc-controls button{
+    background:var(--panel);
+    border:1px solid var(--border);
+    color:var(--text);
+    padding:10px 16px;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:13px;
+    font-weight:600;
+  }
+  .fc-controls button.primary{ background:var(--accent); color:#04211d; border-color:var(--accent); }
+  .fc-controls button:hover{ border-color:var(--accent); }
+  select, .unit-filter{
+    background:var(--panel);
+    color:var(--text);
+    border:1px solid var(--border);
+    border-radius:8px;
+    padding:8px 12px;
+    font-size:13px;
+    margin-bottom:16px;
+  }
+
+  /* Quiz */
+  .quiz-top{ display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px; }
+  .quiz-score{ font-size:13px; color:var(--muted); }
+  .q-card{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:20px;
+    margin-bottom:16px;
+  }
+  .q-card .q-num{ color:var(--accent); font-size:12px; letter-spacing:1px; text-transform:uppercase; margin-bottom:6px;}
+  .q-card p.q-text{ font-size:15.5px; margin:0 0 14px; }
+  .opt{
+    display:block;
+    width:100%;
+    text-align:left;
+    background:var(--panel2);
+    border:1px solid var(--border);
+    color:var(--text);
+    padding:11px 14px;
+    border-radius:10px;
+    margin-bottom:8px;
+    cursor:pointer;
+    font-size:14px;
+  }
+  .opt:hover{ border-color:var(--accent); }
+  .opt.correct{ background:rgba(74,222,128,0.15); border-color:var(--good); }
+  .opt.wrong{ background:rgba(239,91,91,0.15); border-color:var(--danger); }
+  .opt.disabled{ pointer-events:none; opacity:.85; }
+  .explain{
+    font-size:13px;
+    color:var(--muted);
+    margin-top:8px;
+    padding:10px 12px;
+    background:var(--bg2);
+    border-radius:8px;
+    display:none;
+    border-left:3px solid var(--accent);
+  }
+  .explain.show{ display:block; }
+  .quiz-actions{ text-align:center; margin-top:20px; }
+  .quiz-actions button{
+    background:var(--accent);
+    color:#04211d;
+    border:none;
+    padding:12px 26px;
+    border-radius:10px;
+    font-weight:700;
+    cursor:pointer;
+    font-size:14px;
+  }
+  #resultBox{
+    text-align:center;
+    padding:30px;
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    display:none;
+  }
+  #resultBox.show{ display:block; }
+  #resultBox .big{ font-size:44px; font-weight:800; color:var(--accent); margin:8px 0; }
+
+  .footer-note{ text-align:center; color:var(--muted); font-size:12px; margin-top:30px; }
+  .badge-topic{
+    display:inline-block; font-size:11px; color:var(--accent2);
+    border:1px solid rgba(240,180,41,0.4); background:rgba(240,180,41,0.08);
+    padding:2px 8px; border-radius:6px; margin-bottom:8px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <span class="tag">KWASU · CSC 204</span>
+  <h1>Big Data Computing & Security</h1>
+  <p>Interactive study kit — Units 1–5 · Notes · Flashcards · CBT Quiz</p>
+</header>
+
+<nav>
+  <button data-tab="notes" class="active">📘 Notes</button>
+  <button data-tab="flash">🔁 Flashcards</button>
+  <button data-tab="quiz">📝 CBT Quiz</button>
+  <button data-tab="cheat">⚡ Cheat Sheet</button>
+</nav>
+
+<main>
+
+<!-- ===================== NOTES ===================== -->
+<section id="notes" class="active">
+
+  <div class="unit-card">
+    <div class="unit-head" onclick="toggleUnit(this)">
+      <h3>Unit 1 — Introduction to Big Data Analytics</h3>
+      <span class="chev">▼</span>
+    </div>
+    <div class="unit-body">
+      <h4>What is Big Data?</h4>
+      <p>A massive, complex dataset rapidly generated and transmitted from sources like social media, e-commerce, financial markets, and streaming services.</p>
+
+      <h4>The 5 V's</h4>
+      <table>
+        <tr><th>V</th><th>Meaning</th><th>Example</th></tr>
+        <tr><td>Volume</td><td>Enormous amount of data</td><td>Millions of WhatsApp messages/day</td></tr>
+        <tr><td>Velocity</td><td>Speed of generation/processing</td><td>Twitter processes millions of tweets/sec</td></tr>
+        <tr><td>Variety</td><td>Different types/formats</td><td>Emails, videos, images</td></tr>
+        <tr><td>Veracity</td><td>Accuracy/trustworthiness</td><td>Spam or misinformation on social media</td></tr>
+        <tr><td>Value</td><td>Usefulness for decisions</td><td>Personalized ads, patient data analysis</td></tr>
+      </table>
+      <p style="font-size:12px;color:var(--muted)">Memory trick: "5 V's" = <b>V</b>ery <b>V</b>ast <b>V</b>aried data — <b>V</b>erify it's <b>V</b>aluable.</p>
+
+      <h4>Types of Big Data</h4>
+      <ul>
+        <li><b>Structured</b> — fixed format, relational DB (bank transactions, student records)</li>
+        <li><b>Semi-structured</b> — some structure, not tabular (XML, emails, logs)</li>
+        <li><b>Unstructured</b> — no predefined format (images, videos, audio, social posts)</li>
+      </ul>
+
+      <h4>Sources of Big Data</h4>
+      <ul>
+        <li>Social Media (Facebook, Twitter/X, Instagram, YouTube, TikTok)</li>
+        <li>IoT Devices (thermostats, GPS, health monitors, sensors)</li>
+        <li>Transactional Data (ATM, POS, online purchases)</li>
+        <li>Web/Clickstream Data (page views, search queries, downloads)</li>
+      </ul>
+
+      <h4>Traditional Data vs Big Data</h4>
+      <table>
+        <tr><th>Traditional Data</th><th>Big Data</th></tr>
+        <tr><td>Smaller volume</td><td>Massive & complex</td></tr>
+        <tr><td>Structured only</td><td>Structured + semi + unstructured</td></tr>
+        <tr><td>Relational DB</td><td>NoSQL / distributed file systems</td></tr>
+        <tr><td>Static</td><td>Dynamic, constantly changing</td></tr>
+        <tr><td>Historical insight</td><td>Real-time + predictive insight</td></tr>
+      </table>
+
+      <h4>Types of Big Data Analytics</h4>
+      <ul>
+        <li><b>Descriptive</b> — "What happened?" (Sales dropped 20%)</li>
+        <li><b>Diagnostic</b> — "Why did it happen?" (Price increase caused drop)</li>
+        <li><b>Predictive</b> — "What's likely to happen?" (Forecasting churn)</li>
+        <li><b>Prescriptive</b> — "What should we do?" (Reduce prices)</li>
+      </ul>
+      <p style="font-size:12px;color:var(--muted)">Memory trick: D-D-P-P in order of maturity: Descriptive → Diagnostic → Predictive → Prescriptive.</p>
+
+      <h4>Applications (by sector)</h4>
+      <ul>
+        <li>Retail/E-commerce — personalized recs, dynamic pricing</li>
+        <li>Healthcare — disease prediction, resource management</li>
+        <li>Media — content recommendation, sentiment analysis</li>
+        <li>Banking — fraud detection, credit risk assessment</li>
+        <li>Government — crime pattern analysis, public health surveillance</li>
+      </ul>
+
+      <h4>Big Data Analytics Lifecycle (6 stages)</h4>
+      <ol style="color:#c8d5e0;font-size:14.5px;">
+        <li><b>Discovery</b> — define the problem/objective</li>
+        <li><b>Data Collection</b> — gather from multiple sources</li>
+        <li><b>Data Preparation</b> — clean, remove duplicates, fix errors</li>
+        <li><b>Data Analysis & Model Planning</b> — queries, stats, ML</li>
+        <li><b>Data Visualization</b> — charts, dashboards (Power BI, Tableau)</li>
+        <li><b>Data Presentation</b> — reports, recommendations, decisions</li>
+      </ol>
+      <p style="font-size:12px;color:var(--muted)">Memory trick: "Dis Cool Dudes Analyze Visually, Presenting" (Discovery, Collection, Cleaning(Prep), Analysis, Visualization, Presentation)</p>
+
+      <h4>Benefits</h4>
+      <ul><li>Better decision making</li><li>Enhanced customer experience</li><li>Innovation/product development</li><li>Real-time analytics</li></ul>
+
+      <h4>Challenges</h4>
+      <ul><li>Data quality</li><li>Data integration</li><li>Data security</li><li>Scalability/storage bottlenecks</li><li>Talent gap</li></ul>
+    </div>
+  </div>
+
+  <div class="unit-card">
+    <div class="unit-head" onclick="toggleUnit(this)">
+      <h3>Unit 2 — Big Data Ecosystem</h3>
+      <span class="chev">▼</span>
+    </div>
+    <div class="unit-body">
+      <p>The Big Data Ecosystem = collection of technologies, frameworks, and processes to collect, store, process, analyze, and visualize big data.</p>
+
+      <h4>Purpose</h4>
+      <ul>
+        <li>Efficient data management</li>
+        <li>High-speed processing (Spark, Hadoop)</li>
+        <li>Advanced analytics (ML, data mining)</li>
+        <li>Visualization (Tableau, Power BI, Kibana)</li>
+      </ul>
+
+      <h4>Core Components (6 layers)</h4>
+      <ol style="color:#c8d5e0;font-size:14.5px;">
+        <li>Data Sources — social media, IoT, apps, websites</li>
+        <li>Data Storage — distributed file systems, NoSQL DBs</li>
+        <li>Processing Frameworks — batch, stream, distributed</li>
+        <li>Data Analytics Layer — insight extraction</li>
+        <li>Visualization Tools — Tableau, Power BI</li>
+        <li>Security Layer — access control, encryption, backup</li>
+      </ol>
+
+      <h4>Distributed File Systems</h4>
+      <p><b>Key characteristics:</b> Scalability, Fault Tolerance, High Availability, Data Replication</p>
+      <p><b>HDFS (Hadoop Distributed File System):</b> splits data into blocks (128MB/256MB), distributes across DataNodes; a <b>NameNode</b> tracks metadata & block locations; replication (2–3 copies) gives fault tolerance.</p>
+
+      <h4>NoSQL Databases (4 types)</h4>
+      <table>
+        <tr><th>Type</th><th>Examples</th><th>Use Case</th></tr>
+        <tr><td>Document-Oriented</td><td>MongoDB, CouchDB</td><td>User profiles, IoT data</td></tr>
+        <tr><td>Column-Oriented</td><td>Cassandra, HBase</td><td>Time-series, event logging</td></tr>
+        <tr><td>Key-Value Store</td><td>Redis, DynamoDB</td><td>Caching, sessions</td></tr>
+        <tr><td>Graph DB</td><td>Neo4j, ArangoDB</td><td>Social networks, fraud detection</td></tr>
+      </table>
+      <p style="font-size:12px;color:var(--muted)">Memory trick: "Doc Col Key Graph" — Document, Column, Key-Value, Graph.</p>
+
+      <h4>Processing Frameworks (3 types)</h4>
+      <table>
+        <tr><th>Type</th><th>Trait</th><th>Tools</th></tr>
+        <tr><td>Batch</td><td>Scheduled, delayed results</td><td>Hadoop, Spark</td></tr>
+        <tr><td>Stream</td><td>Real-time, low latency</td><td>Kafka, Flink, Storm</td></tr>
+        <tr><td>Distributed</td><td>Parallel across machines</td><td>Hadoop, Spark, MapReduce</td></tr>
+      </table>
+
+      <h4>Security Layer</h4>
+      <p>Access control, encryption, data privacy, backup & recovery.</p>
+    </div>
+  </div>
+
+  <div class="unit-card">
+    <div class="unit-head" onclick="toggleUnit(this)">
+      <h3>Unit 3 — Big Data in Cybersecurity</h3>
+      <span class="chev">▼</span>
+    </div>
+    <div class="unit-body">
+      <h4>Cybersecurity Goals (CIA Triad)</h4>
+      <ul>
+        <li><b>Confidentiality</b> — only authorized access</li>
+        <li><b>Integrity</b> — accuracy & completeness of data</li>
+        <li><b>Availability</b> — accessible when needed</li>
+      </ul>
+
+      <h4>Common Cyber-Attacks</h4>
+      <ul>
+        <li><b>Malware</b> — viruses, worms, trojans, ransomware</li>
+        <li><b>Phishing</b> — impersonating a legitimate source</li>
+        <li><b>DDoS</b> — overwhelms system with traffic</li>
+        <li><b>Insider Threats</b> — current/former employees with access</li>
+        <li><b>IoT-based attacks</b> — target smart cameras, wearables, sensors</li>
+      </ul>
+
+      <h4>Big Data in Cybersecurity — Definition</h4>
+      <p>Large-scale data collection, storage & advanced analytics to detect, prevent, and respond to cyber threats in real time — analyzing network logs, user behavior, firewall events, threat intel feeds to find IOCs (Indicators of Compromise).</p>
+
+      <h4>Data Sources for Cybersecurity (4 categories)</h4>
+      <table>
+        <tr><th>Category</th><th>Includes</th></tr>
+        <tr><td>Network Data</td><td>Firewall logs, proxy logs, traffic logs</td></tr>
+        <tr><td>Endpoint Data</td><td>Process data, file activity, user activity, network connections</td></tr>
+        <tr><td>IAM Data</td><td>Authentication logs, authorization logs, directory service logs</td></tr>
+        <tr><td>Physical Security Data</td><td>Alarm/sensor data, surveillance footage</td></tr>
+      </table>
+
+      <h4>Applications of Big Data in Cybersecurity (8)</h4>
+      <ul>
+        <li>Threat detection & identification</li>
+        <li>Fraud detection & prevention</li>
+        <li>Intrusion Detection Systems (IDS)</li>
+        <li>Network traffic analysis</li>
+        <li>User & Entity Behavior Analytics (UEBA)</li>
+        <li>Predictive cybersecurity</li>
+        <li>Vulnerability assessment & risk management</li>
+        <li>Digital forensics & incident investigation</li>
+      </ul>
+
+      <h4>How Big Data Works in Cybersecurity (6 stages)</h4>
+      <ol style="color:#c8d5e0;font-size:14.5px;">
+        <li>Data Collection (Acquisition Layer)</li>
+        <li>Data Storage (HDFS, cloud, data lakes)</li>
+        <li>Data Processing (clean, standardize, filter)</li>
+        <li>Data Analysis (ML + statistical analysis)</li>
+        <li>Alert Generation</li>
+        <li>Incident Response (block IP, isolate systems, disable accounts)</li>
+      </ol>
+
+      <h4>Benefits</h4>
+      <ul><li>Faster threat detection</li><li>Improved fraud prevention</li><li>Enhanced monitoring</li><li>Better decision making</li><li>Predictive security analysis</li><li>Better incident response</li></ul>
+
+      <h4>Challenges</h4>
+      <ul><li>False positives</li><li>Model drift</li><li>Complexity (many tools to manage)</li><li>Data quality problems</li><li>High storage cost</li><li>Scalability/performance</li><li>Fast-changing threats</li></ul>
+    </div>
+  </div>
+
+  <div class="unit-card">
+    <div class="unit-head" onclick="toggleUnit(this)">
+      <h3>Unit 4 — Big Data for Network Forensics</h3>
+      <span class="chev">▼</span>
+    </div>
+    <div class="unit-body">
+      <p><b>Network Forensics</b> = branch of digital forensics that monitors, captures, records, and analyzes network traffic to investigate cybercrimes. Answers: What / When / How / Who / What systems affected.</p>
+
+      <h4>Objectives (5)</h4>
+      <ul>
+        <li>Identify cyberattacks</li>
+        <li>Gather digital evidence</li>
+        <li>Trace attackers</li>
+        <li>Understand attack methods</li>
+        <li>Improve future security measures</li>
+      </ul>
+
+      <h4>Network-Based Evidence Sources</h4>
+      <p>Switches, Routers, DHCP Servers, Authentication Servers, IDS/IPS, Firewalls, Application Servers.</p>
+
+      <h4>Types of Network Data</h4>
+      <table>
+        <tr><th>Type</th><th>Details</th></tr>
+        <tr><td>Flow Data</td><td>Source/dest IP, duration, packet count</td></tr>
+        <tr><td>Log Data</td><td>Firewall, IDS/IPS, DNS, web proxy, DHCP, auth logs</td></tr>
+        <tr><td>Packet Data</td><td>HTTP requests, emails, video streams (most detail, huge volume)</td></tr>
+      </table>
+
+      <h4>Network Forensic Process (6 phases)</h4>
+      <ol style="color:#c8d5e0;font-size:14.5px;">
+        <li><b>Identification</b> — recognize an incident occurred</li>
+        <li><b>Collection</b> — gather packets, records, logs</li>
+        <li><b>Preservation</b> — protect evidence integrity (write protection, backups)</li>
+        <li><b>Analysis</b> — examine, correlate, reconstruct events, trace source</li>
+        <li><b>Documentation</b> — record every step</li>
+        <li><b>Presentation</b> — clear, accurate, evidence-based report</li>
+      </ol>
+      <p style="font-size:12px;color:var(--muted)">Memory trick: "I Can Preserve Analysis, Document, Present" — ICPADP.</p>
+
+      <h4>How Big Data Applies to the Process</h4>
+      <ul>
+        <li><b>Ingest</b> massive logs in real time — Kafka, Flume</li>
+        <li><b>Parse/normalize/filter</b> — Logstash, Apache NiFi (raw log → structured fields → consistent format → only relevant records)</li>
+        <li><b>Distributed queries</b> across data lakes — Hive, Spark SQL (parallel search across many computers)</li>
+        <li><b>ML-based threat classification</b></li>
+        <li><b>Correlate events</b> from multiple sources (VPN + DNS + endpoint)</li>
+        <li><b>Visualize timelines</b> — Kibana, Grafana</li>
+      </ul>
+      <p><b>Parsing</b> = extracting meaningful fields from raw data. <b>Normalization</b> = converting different formats into one consistent structure. <b>Filtering</b> = keeping only relevant records.</p>
+
+      <h4>Benefits</h4>
+      <ul><li>Faster investigation</li><li>Real-time monitoring</li><li>Better threat detection</li><li>Enhanced attack attribution</li><li>Better decision making</li><li>Scalable storage/processing</li></ul>
+
+      <h4>Challenges</h4>
+      <ul><li>Storage costs</li><li>Data complexity</li><li>High processing requirements</li><li>Need for skilled investigators</li></ul>
+    </div>
+  </div>
+
+  <div class="unit-card">
+    <div class="unit-head" onclick="toggleUnit(this)">
+      <h3>Unit 5 — Design Considerations for Big Data Software Tools</h3>
+      <span class="chev">▼</span>
+    </div>
+    <div class="unit-body">
+      <p>Big Data software tools (e.g. Hadoop, Spark) collect, store, process, analyze, and visualize massive data. Poor design → data loss, security breaches, slow performance, crashes, high costs.</p>
+
+      <h4>7 Key Design Considerations</h4>
+      <table>
+        <tr><th>Consideration</th><th>Meaning</th></tr>
+        <tr><td>1. Scalability</td><td>Handle growing data/users without losing performance (Horizontal = more servers; Vertical = more CPU/RAM/storage on one server)</td></tr>
+        <tr><td>2. Reliability</td><td>Operate correctly & consistently over time</td></tr>
+        <tr><td>3. Performance</td><td>Speed/efficiency — response time, throughput, processing speed</td></tr>
+        <tr><td>4. Fault Tolerance</td><td>Keep working when components fail — replication, backups, redundant servers</td></tr>
+        <tr><td>5. Security</td><td>Confidentiality, Integrity, Availability — authentication, authorization, monitoring</td></tr>
+        <tr><td>6. Usability</td><td>Easy to learn/use — friendly UI, clear navigation</td></tr>
+        <tr><td>7. Maintainability</td><td>Easy to update/repair/improve over its lifecycle</td></tr>
+      </table>
+      <p style="font-size:12px;color:var(--muted)">Memory trick: "Some Really Practical Features Save Usability & Maintenance" → Scalability, Reliability, Performance, Fault Tolerance, Security, Usability, Maintainability.</p>
+    </div>
+  </div>
+
+</section>
+
+<!-- ===================== FLASHCARDS ===================== -->
+<section id="flash">
+  <div class="fc-wrap">
+    <select id="fcUnitFilter" onchange="filterFlashcards()">
+      <option value="all">All Units</option>
+      <option value="1">Unit 1 — Intro to Big Data</option>
+      <option value="2">Unit 2 — Big Data Ecosystem</option>
+      <option value="3">Unit 3 — Big Data in Cybersecurity</option>
+      <option value="4">Unit 4 — Network Forensics</option>
+      <option value="5">Unit 5 — Design Considerations</option>
+    </select>
+    <div class="fc-progress" id="fcProgress">Card 1 of 40</div>
+    <div class="badge-topic" id="fcUnitBadge">Unit 1</div>
+    <div class="flashcard" id="flashcard" onclick="flipCard()">
+      <span class="face-label" id="faceLabel">Question</span>
+      <div id="fcText">Loading...</div>
+    </div>
+    <div class="fc-controls">
+      <button onclick="prevCard()">⬅ Prev</button>
+      <button class="primary" onclick="flipCard()">🔄 Flip</button>
+      <button onclick="nextCard()">Next ➡</button>
+      <button onclick="shuffleCards()">🔀 Shuffle</button>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== QUIZ ===================== -->
+<section id="quiz">
+  <div class="quiz-top">
+    <div class="quiz-score" id="quizScore">Score: 0 / 0</div>
+    <select id="quizUnitFilter" onchange="startQuiz()">
+      <option value="all">All Units (30 Qs)</option>
+      <option value="1">Unit 1 only</option>
+      <option value="2">Unit 2 only</option>
+      <option value="3">Unit 3 only</option>
+      <option value="4">Unit 4 only</option>
+      <option value="5">Unit 5 only</option>
+    </select>
+  </div>
+  <div id="quizContainer"></div>
+  <div class="quiz-actions">
+    <button onclick="startQuiz()">🔁 Restart Quiz</button>
+  </div>
+  <div id="resultBox">
+    <div class="badge-topic">Result</div>
+    <div class="big" id="resultScore">0%</div>
+    <p id="resultMsg" style="color:var(--muted)"></p>
+  </div>
+</section>
+
+<!-- ===================== CHEAT SHEET ===================== -->
+<section id="cheat">
+  <div class="unit-card open">
+    <div class="unit-head" onclick="toggleUnit(this)">
+      <h3>⚡ Last-Minute Cheat Sheet</h3>
+      <span class="chev">▼</span>
+    </div>
+    <div class="unit-body" style="max-height:none;padding:14px 18px 18px;">
+      <h4>5 V's of Big Data</h4>
+      <p>Volume, Velocity, Variety, Veracity, Value</p>
+
+      <h4>3 Types of Big Data</h4>
+      <p>Structured → Semi-structured → Unstructured</p>
+
+      <h4>4 Types of Analytics</h4>
+      <p>Descriptive (what happened) → Diagnostic (why) → Predictive (what's likely) → Prescriptive (what to do)</p>
+
+      <h4>6-Stage Analytics Lifecycle</h4>
+      <p>Discovery → Collection → Preparation (cleaning) → Analysis → Visualization → Presentation</p>
+
+      <h4>4 Types of NoSQL DB</h4>
+      <p>Document (MongoDB) · Column (Cassandra) · Key-Value (Redis) · Graph (Neo4j)</p>
+
+      <h4>3 Processing Types</h4>
+      <p>Batch (Hadoop/Spark) · Stream (Kafka/Flink) · Distributed (MapReduce)</p>
+
+      <h4>CIA Triad</h4>
+      <p>Confidentiality · Integrity · Availability</p>
+
+      <h4>4 Cybersecurity Data Sources</h4>
+      <p>Network Data · Endpoint Data · IAM Data · Physical Security Data</p>
+
+      <h4>6-Stage Big Data Cybersecurity Process</h4>
+      <p>Collection → Storage → Processing → Analysis → Alert Generation → Incident Response</p>
+
+      <h4>6-Phase Network Forensic Process</h4>
+      <p>Identification → Collection → Preservation → Analysis → Documentation → Presentation</p>
+
+      <h4>Parsing vs Normalization vs Filtering</h4>
+      <p><b>Parse</b> = extract fields from raw data. <b>Normalize</b> = unify different formats. <b>Filter</b> = keep only relevant records.</p>
+
+      <h4>7 Design Considerations (Big Data Software)</h4>
+      <p>Scalability · Reliability · Performance · Fault Tolerance · Security · Usability · Maintainability</p>
+
+      <h4>HDFS Key Terms</h4>
+      <p><b>NameNode</b> = master, tracks metadata. <b>DataNode</b> = worker, stores actual data blocks. Blocks are typically 128MB or 256MB, replicated 2–3x.</p>
+
+      <h4>Key Tool Pairings</h4>
+      <table>
+        <tr><th>Purpose</th><th>Tool(s)</th></tr>
+        <tr><td>Batch processing</td><td>Hadoop, Spark</td></tr>
+        <tr><td>Stream processing</td><td>Kafka, Flink, Storm</td></tr>
+        <tr><td>Ingest logs real-time</td><td>Kafka, Flume</td></tr>
+        <tr><td>Parse/normalize</td><td>Logstash, Apache NiFi</td></tr>
+        <tr><td>Distributed queries</td><td>Hive, Spark SQL</td></tr>
+        <tr><td>Visualization</td><td>Tableau, Power BI, Kibana, Grafana</td></tr>
+      </table>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<p class="footer-note">CSC 204 Study Kit · Built from our course PDF's· Good luck, we've got this 💪</p>
+
+<script>
+// ---------- TAB NAV ----------
+const tabs = document.querySelectorAll('nav button');
+const sections = document.querySelectorAll('main > section');
+tabs.forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    tabs.forEach(b=>b.classList.remove('active'));
+    sections.forEach(s=>s.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+    if(btn.dataset.tab==='quiz' && !quizStarted){ startQuiz(); }
+  });
+});
+
+// ---------- UNIT ACCORDION ----------
+function toggleUnit(headEl){
+  const card = headEl.parentElement;
+  card.classList.toggle('open');
+}
+// open first unit by default
+document.querySelector('#notes .unit-card').classList.add('open');
+
+// ---------- FLASHCARD DATA ----------
+const flashcards = [
+  // Unit 1
+  {u:1, q:"What are the 5 V's of Big Data?", a:"Volume, Velocity, Variety, Veracity, Value"},
+  {u:1, q:"Define Volume in Big Data.", a:"The enormous amount of data generated, e.g. millions of WhatsApp messages daily."},
+  {u:1, q:"Define Velocity in Big Data.", a:"The speed at which data is generated, collected, and processed, e.g. Twitter processing millions of tweets/sec."},
+  {u:1, q:"Define Variety in Big Data.", a:"Different types and formats of data, e.g. emails, videos, images."},
+  {u:1, q:"Define Veracity in Big Data.", a:"The accuracy and trustworthiness of data — social media data may contain spam or misinformation."},
+  {u:1, q:"Define Value in Big Data.", a:"The usefulness of data for decision-making, e.g. personalized ads increasing sales."},
+  {u:1, q:"Name the 3 types of Big Data.", a:"Structured, Semi-structured, Unstructured"},
+  {u:1, q:"Give 2 examples of structured data.", a:"Bank transactions, employee records in HR databases"},
+  {u:1, q:"Give 2 examples of semi-structured data.", a:"XML files, email messages, log files"},
+  {u:1, q:"Give 2 examples of unstructured data.", a:"Images, videos, audio files, social media posts"},
+  {u:1, q:"Name 4 sources of Big Data.", a:"Social media, IoT devices, transactional data, web/clickstream data"},
+  {u:1, q:"What is traditional data?", a:"Structured data stored in relational databases, easily searchable, predefined format (e.g. customer info, sales reports)."},
+  {u:1, q:"Give one key difference between traditional data and big data.", a:"Traditional data is static and structured; Big Data is dynamic and includes structured, semi-structured, and unstructured data."},
+  {u:1, q:"What is Big Data Analytics?", a:"The process of examining large, complex datasets to uncover trends, preferences, and business insights."},
+  {u:1, q:"Name the 4 types of Big Data Analytics.", a:"Descriptive, Diagnostic, Predictive, Prescriptive"},
+  {u:1, q:"Which analytics type answers 'Why did it happen?'", a:"Diagnostic Analytics"},
+  {u:1, q:"Which analytics type answers 'What should we do?'", a:"Prescriptive Analytics"},
+  {u:1, q:"List the 6 stages of the Big Data Analytics Lifecycle.", a:"Discovery, Data Collection, Data Preparation, Data Analysis & Model Planning, Data Visualization, Data Presentation"},
+  {u:1, q:"What happens in the 'Discovery' stage of the lifecycle?", a:"Clearly define the problem or objective the organization wants to achieve."},
+  {u:1, q:"What happens in the 'Data Preparation' stage?", a:"Cleaning data — handling missing values, removing duplicates, correcting errors."},
+  {u:1, q:"Name 2 common visualization tools mentioned in the notes.", a:"Microsoft Power BI, Tableau (also Microsoft Excel)"},
+  {u:1, q:"Name 2 benefits of Big Data Analytics.", a:"Better decision making, enhanced customer experience (also innovation, real-time analytics)"},
+  {u:1, q:"Name 2 challenges of Big Data Analytics.", a:"Data quality, data integration (also security, scalability, talent gap)"},
+  // Unit 2
+  {u:2, q:"What is the Big Data Ecosystem?", a:"The collection of technologies, frameworks, and processes used to collect, store, process, analyze, and visualize big data."},
+  {u:2, q:"List the 6 core components of the Big Data Ecosystem.", a:"Data Sources, Data Storage, Processing Frameworks, Data Analytics Layer, Visualization Tools, Security Layer"},
+  {u:2, q:"What does HDFS stand for and do?", a:"Hadoop Distributed File System — splits data into blocks and distributes them across multiple nodes."},
+  {u:2, q:"What is the role of the NameNode in HDFS?", a:"It's the master node that tracks which block is stored on which server, plus file directory and metadata."},
+  {u:2, q:"What is the role of DataNodes in HDFS?", a:"Worker nodes that actually store the data and handle read/write operations."},
+  {u:2, q:"Name the 4 types of NoSQL databases.", a:"Document-Oriented, Column-Oriented, Key-Value Stores, Graph Databases"},
+  {u:2, q:"Give an example of a Document-Oriented database.", a:"MongoDB (also CouchDB, Amazon DocumentDB)"},
+  {u:2, q:"Give an example of a Column-Oriented database.", a:"Apache Cassandra (also Apache HBase)"},
+  {u:2, q:"Give an example of a Key-Value store.", a:"Redis (also Amazon DynamoDB)"},
+  {u:2, q:"Give an example of a Graph database.", a:"Neo4j (also ArangoDB, Amazon Neptune)"},
+  {u:2, q:"In graph databases, what does a 'node' and 'edge' represent?", a:"Node = an entity (person, place, object); Edge = a relationship between two nodes"},
+  {u:2, q:"Name the 3 types of Big Data processing.", a:"Batch Processing, Stream Processing, Distributed Processing"},
+  {u:2, q:"What tools are used for Batch Processing?", a:"Apache Hadoop, Apache Spark"},
+  {u:2, q:"What tools are used for Stream Processing?", a:"Apache Kafka, Apache Flink, Apache Storm"},
+  {u:2, q:"Give an example of Stream Processing use.", a:"Detecting fraudulent ATM withdrawal instantly, live stock updates, GPS navigation"},
+  {u:2, q:"What does the Security Layer of the ecosystem include?", a:"Access control, encryption, data privacy, backup and recovery"},
+  // Unit 3
+  {u:3, q:"What are the 3 goals of cybersecurity (CIA Triad)?", a:"Confidentiality, Integrity, Availability"},
+  {u:3, q:"What is Malware?", a:"Code/software intentionally designed to cause harm — includes viruses, worms, trojans, ransomware."},
+  {u:3, q:"What is Phishing?", a:"Tricking users into revealing sensitive info by pretending to be a legitimate source."},
+  {u:3, q:"What is a DDoS attack?", a:"Distributed Denial of Service — makes a system/website unavailable by overwhelming it with traffic from multiple points."},
+  {u:3, q:"What is an Insider Threat?", a:"Internal actors (current/former employees) who have direct access to networks/data and pose a danger."},
+  {u:3, q:"Define Big Data in Cybersecurity.", a:"Large-scale data collection, storage, and advanced analytics to detect, prevent, and respond to cyber threats in real time."},
+  {u:3, q:"What does IOC stand for?", a:"Indicators of Compromise"},
+  {u:3, q:"Name the 4 data source categories for cybersecurity.", a:"Network Data, Endpoint Data, IAM Data, Physical Security Data"},
+  {u:3, q:"What do firewall logs contain?", a:"Information about allowed/denied connections, source or destination IPs & ports."},
+  {u:3, q:"What do proxy logs track?", a:"Internet usage and web access by users within the network — helps detect malicious website visits."},
+  {u:3, q:"What is IAM data?", a:"Identity and Access Management data — tracks who has access to what, when, and how (authentication, authorization, directory logs)."},
+  {u:3, q:"Name 3 applications of Big Data in cybersecurity.", a:"Threat detection, fraud detection, intrusion detection (also UEBA, predictive security, digital forensics)"},
+  {u:3, q:"What is UEBA?", a:"User and Entity Behavior Analytics — studies normal behavior of users/devices then flags abnormal activity."},
+  {u:3, q:"List the 6 stages of how Big Data works in cybersecurity.", a:"Data Collection, Data Storage, Data Processing, Data Analysis, Alert Generation, Incident Response"},
+  {u:3, q:"Name 2 automated incident response actions.", a:"Blocking suspicious IPs, isolating compromised systems, disabling compromised accounts"},
+  {u:3, q:"What is a 'False Positive' in Big Data cybersecurity?", a:"When normal activity is flagged as suspicious, e.g. a traveler logging in from another country."},
+  {u:3, q:"What is 'Model Drift'?", a:"When ML models trained on historical data become less accurate as the threat landscape evolves."},
+  // Unit 4
+  {u:4, q:"Define Network Forensics.", a:"A branch of digital forensics that monitors, captures, records, and analyzes network traffic to investigate security incidents/cybercrimes."},
+  {u:4, q:"What 5 questions does network forensics try to answer?", a:"What happened? When? How? Who was responsible? What systems were affected?"},
+  {u:4, q:"Name 3 network-based evidence sources.", a:"Switches, Routers, Firewalls (also DHCP servers, Authentication servers, IDS/IPS, Application servers)"},
+  {u:4, q:"Name the 3 types of network data crucial for forensics.", a:"Network Flow Data, Log Data, Packet Data"},
+  {u:4, q:"What does Flow Data include?", a:"Source/destination IPs, communication duration/time, number of packets"},
+  {u:4, q:"Which type of network data provides the most detail but generates huge volumes?", a:"Packet Data"},
+  {u:4, q:"List the 6 phases of the Network Forensic Process.", a:"Identification, Collection, Preservation, Analysis, Documentation, Presentation"},
+  {u:4, q:"What happens in the Preservation phase?", a:"Ensures collected evidence remains unchanged/protected — write protection, access control, backups."},
+  {u:4, q:"What happens in the Analysis phase?", a:"Examine, interpret, and correlate data to reconstruct events, detect attack type, trace source, assess impact."},
+  {u:4, q:"What tools ingest massive logs/flows in real-time?", a:"Kafka, Flume"},
+  {u:4, q:"What tools are used to parse, normalize, and filter data?", a:"Logstash, Apache NiFi"},
+  {u:4, q:"What is 'Parsing' in the context of network forensics?", a:"Reading raw data and extracting meaningful fields so a computer can process the information."},
+  {u:4, q:"What is 'Normalization' in the context of network forensics?", a:"Converting parsed data from different sources into a common, consistent structure."},
+  {u:4, q:"What is 'Filtering' in the context of network forensics?", a:"Selecting only records that meet specific conditions while ignoring irrelevant data."},
+  {u:4, q:"What tools run distributed queries across data lakes?", a:"Hive, Spark SQL"},
+  {u:4, q:"What tools visualize incident timelines?", a:"Kibana, Grafana"},
+  {u:4, q:"Name 2 benefits of Big Data in Network Forensics.", a:"Faster investigation, real-time monitoring (also better threat detection, enhanced attack attribution)"},
+  // Unit 5
+  {u:5, q:"List the 7 key design considerations for Big Data software tools.", a:"Scalability, Reliability, Performance, Fault Tolerance, Security, Usability, Maintainability"},
+  {u:5, q:"What is Scalability?", a:"The ability of a system to handle increasing data/users/workload without losing performance."},
+  {u:5, q:"Differentiate Horizontal vs Vertical Scalability.", a:"Horizontal = adding more servers; Vertical = increasing resources (CPU/RAM/storage) of an existing server."},
+  {u:5, q:"What is Reliability in system design?", a:"The ability to operate correctly and consistently over time without failure."},
+  {u:5, q:"Name 3 performance metrics.", a:"Response time, throughput, processing speed"},
+  {u:5, q:"What is Fault Tolerance?", a:"The system's ability to continue operating correctly even if some components fail."},
+  {u:5, q:"Name 3 fault tolerance techniques.", a:"Data replication, backup systems, redundant servers"},
+  {u:5, q:"What are the 3 security objectives in system design?", a:"Confidentiality, Integrity, Availability"},
+  {u:5, q:"Name 3 common security measures.", a:"Authentication, Authorization, Monitoring"},
+  {u:5, q:"What is Usability?", a:"How easy software is to learn, use, and understand — user-friendly interface, clear navigation."},
+  {u:5, q:"What is Maintainability?", a:"How easily a system can be updated, repaired, and improved throughout its lifecycle."},
+];
+
+let fcState = { list: [...flashcards], idx: 0, flipped:false };
+
+function renderFlashcard(){
+  const card = fcState.list[fcState.idx];
+  document.getElementById('fcProgress').textContent = `Card ${fcState.idx+1} of ${fcState.list.length}`;
+  document.getElementById('fcUnitBadge').textContent = 'Unit ' + card.u;
+  document.getElementById('fcText').textContent = fcState.flipped ? card.a : card.q;
+  document.getElementById('faceLabel').textContent = fcState.flipped ? 'Answer' : 'Question';
+  document.getElementById('flashcard').classList.toggle('answer', fcState.flipped);
+}
+function flipCard(){ fcState.flipped = !fcState.flipped; renderFlashcard(); }
+function nextCard(){ fcState.idx = (fcState.idx+1) % fcState.list.length; fcState.flipped=false; renderFlashcard(); }
+function prevCard(){ fcState.idx = (fcState.idx-1+fcState.list.length) % fcState.list.length; fcState.flipped=false; renderFlashcard(); }
+function shuffleCards(){
+  for(let i=fcState.list.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [fcState.list[i], fcState.list[j]] = [fcState.list[j], fcState.list[i]];
+  }
+  fcState.idx=0; fcState.flipped=false; renderFlashcard();
+}
+function filterFlashcards(){
+  const val = document.getElementById('fcUnitFilter').value;
+  fcState.list = val==='all' ? [...flashcards] : flashcards.filter(c=>String(c.u)===val);
+  fcState.idx=0; fcState.flipped=false; renderFlashcard();
+}
+renderFlashcard();
+
+// ---------- QUIZ DATA ----------
+const quizBank = [
+  {u:1, q:"Which of the 5 V's refers to the accuracy and trustworthiness of data?", opts:["Volume","Veracity","Velocity","Variety"], correct:1, exp:"Veracity means the accuracy and trustworthiness of data — social media data may contain spam or misinformation."},
+  {u:1, q:"Data stored in a fixed format such as rows and columns in a relational database is called:", opts:["Unstructured data","Semi-structured data","Structured data","Meta data"], correct:2, exp:"Structured data is organized in a fixed format, typically stored in relational databases."},
+  {u:1, q:"Which analytics type answers the question 'What is likely to happen?'", opts:["Descriptive","Diagnostic","Predictive","Prescriptive"], correct:2, exp:"Predictive Analytics uses historical data to forecast future events."},
+  {u:1, q:"In the Big Data Analytics Lifecycle, what comes immediately after Data Collection?", opts:["Data Visualization","Discovery","Data Preparation","Data Presentation"], correct:2, exp:"Order: Discovery → Data Collection → Data Preparation → Analysis → Visualization → Presentation."},
+  {u:1, q:"XML files and email messages are examples of which data type?", opts:["Structured data","Semi-structured data","Unstructured data","Traditional data"], correct:1, exp:"Semi-structured data has some structure but can't be recorded in a strict tabular format."},
+  {u:1, q:"Which of these is a benefit of Big Data Analytics?", opts:["Increased data silos","Reduced customer personalization","Enhanced customer experience","Slower decision making"], correct:2, exp:"Big Data Analytics enhances customer experience via personalization, e.g. Netflix recommendations."},
+  {u:1, q:"Netflix suggesting movies based on watch history is an example of Big Data applied in:", opts:["Banking & Finance","Media & Entertainment","Government sector","Healthcare"], correct:1, exp:"Content recommendation is a Media & Entertainment application of Big Data Analytics."},
+
+  {u:2, q:"HDFS stands for:", opts:["High Data File Storage","Hadoop Distributed File System","Hybrid Data Flow Server","Hadoop Data Format Standard"], correct:1, exp:"HDFS = Hadoop Distributed File System, which splits data into blocks across multiple nodes."},
+  {u:2, q:"Which NoSQL database type stores data as nodes and edges?", opts:["Document-Oriented","Column-Oriented","Key-Value Store","Graph Database"], correct:3, exp:"Graph databases like Neo4j use nodes (entities) and edges (relationships)."},
+  {u:2, q:"Redis and Amazon DynamoDB are examples of which NoSQL database type?", opts:["Document-Oriented","Key-Value Store","Column-Oriented","Graph Database"], correct:1, exp:"Redis and DynamoDB are Key-Value Stores — fast and scalable for simple lookups."},
+  {u:2, q:"In HDFS, which component keeps track of file directory and metadata?", opts:["DataNode","NameNode","Block Manager","Cluster Node"], correct:1, exp:"The NameNode (master node) tracks which block is stored on which server plus metadata."},
+  {u:2, q:"Which processing type handles data immediately as it arrives with low latency?", opts:["Batch Processing","Stream Processing","Archive Processing","Static Processing"], correct:1, exp:"Stream processing handles data continuously and immediately, useful for time-sensitive apps."},
+  {u:2, q:"Apache Cassandra and Apache HBase are examples of:", opts:["Key-Value Stores","Column-Oriented databases","Document-Oriented databases","Graph databases"], correct:1, exp:"Cassandra and HBase are Column-Oriented databases, suitable for analytics."},
+  {u:2, q:"Which of the following is NOT one of the 6 core components of the Big Data Ecosystem?", opts:["Data Sources","Visualization Tools","Marketing Layer","Security Layer"], correct:2, exp:"The 6 components are Data Sources, Storage, Processing Frameworks, Analytics Layer, Visualization Tools, and Security Layer — not 'Marketing Layer'."},
+
+  {u:3, q:"Which of the following is NOT part of the CIA triad in cybersecurity?", opts:["Confidentiality","Integrity","Availability","Accountability"], correct:3, exp:"CIA Triad = Confidentiality, Integrity, Availability."},
+  {u:3, q:"An attack that overwhelms a system with traffic from multiple points to deny service is called:", opts:["Phishing","Malware","DDoS attack","Insider threat"], correct:2, exp:"A DDoS (Distributed Denial of Service) attack overwhelms a system with traffic from many points."},
+  {u:3, q:"IOC in cybersecurity stands for:", opts:["Internal Operations Control","Indicators of Compromise","Internet Object Code","Incident Occurrence Chart"], correct:1, exp:"IOC = Indicators of Compromise, patterns that suggest a security breach."},
+  {u:3, q:"Which data source category includes firewall logs, proxy logs, and traffic logs?", opts:["Endpoint Data","IAM Data","Network Data","Physical Security Data"], correct:2, exp:"Network Data includes firewall logs, proxy logs, and traffic logs."},
+  {u:3, q:"UEBA stands for:", opts:["User and Entity Behavior Analytics","Unified Endpoint Behavior Analysis","User Encryption and Backup Automation","Unauthorized Entity Blocking Algorithm"], correct:0, exp:"UEBA = User and Entity Behavior Analytics, which studies normal behavior to detect anomalies."},
+  {u:3, q:"A traveler logging in from another country being flagged as suspicious is an example of:", opts:["Model drift","False positive","Data quality problem","Insider threat"], correct:1, exp:"A False Positive occurs when normal activity appears suspicious."},
+  {u:3, q:"Which stage comes right after 'Data Analysis' in the Big Data cybersecurity process?", opts:["Data Storage","Alert Generation","Data Collection","Incident Response"], correct:1, exp:"Order: Collection → Storage → Processing → Analysis → Alert Generation → Incident Response."},
+  {u:3, q:"Tricking users into revealing sensitive information by pretending to be legitimate is called:", opts:["Malware","Phishing","DDoS","IoT attack"], correct:1, exp:"Phishing involves impersonating a legitimate source to trick users."},
+
+  {u:4, q:"Network Forensics is a branch of:", opts:["Software engineering","Digital forensics","Data warehousing","Network administration"], correct:1, exp:"Network Forensics is a branch of digital forensics focused on network traffic analysis."},
+  {u:4, q:"Which type of network data provides the most detail but generates the largest volume?", opts:["Flow Data","Log Data","Packet Data","Metadata"], correct:2, exp:"Packet data provides the most detail (HTTP requests, emails, video streams) but generates huge volumes."},
+  {u:4, q:"Which phase of the Network Forensic Process ensures evidence remains unchanged?", opts:["Collection","Preservation","Analysis","Documentation"], correct:1, exp:"Preservation ensures collected evidence remains unchanged and protected — via write protection, access control, backups."},
+  {u:4, q:"Which tools are used to ingest massive logs and flows in real-time?", opts:["Hive, Spark SQL","Kafka, Flume","Kibana, Grafana","Logstash, NiFi"], correct:1, exp:"Kafka and Flume are used to ingest massive logs/flows in real time."},
+  {u:4, q:"Converting parsed data from different sources into a consistent structure is called:", opts:["Filtering","Parsing","Normalization","Correlation"], correct:2, exp:"Normalization converts parsed data from different sources into a common, consistent structure."},
+  {u:4, q:"Which tool is used to run distributed queries across data lakes?", opts:["Kafka","Hive","Grafana","Flume"], correct:1, exp:"Hive (and Spark SQL) allow distributed queries across billions of records in data lakes."},
+  {u:4, q:"Selecting only records that meet specific conditions (e.g. blocked connections) is called:", opts:["Parsing","Normalization","Filtering","Correlation"], correct:2, exp:"Filtering selects only records meeting specific conditions while ignoring irrelevant data."},
+  {u:4, q:"Which phase of the forensic process involves recording every step for transparency?", opts:["Analysis","Documentation","Presentation","Identification"], correct:1, exp:"Documentation involves recording evidence sources, procedures, findings, and timelines."},
+
+  {u:5, q:"Adding more servers to a system to handle growth is an example of:", opts:["Vertical scalability","Horizontal scalability","Fault tolerance","Maintainability"], correct:1, exp:"Horizontal Scalability = adding more computers/servers to the system."},
+  {u:5, q:"Increasing the CPU, RAM, or storage of an existing server is an example of:", opts:["Horizontal scalability","Vertical scalability","Reliability","Usability"], correct:1, exp:"Vertical Scalability = increasing the resources of an existing server."},
+  {u:5, q:"A system's ability to keep functioning even when a server crashes is called:", opts:["Scalability","Reliability","Fault Tolerance","Usability"], correct:2, exp:"Fault Tolerance is the ability to continue operating correctly even if some components fail."},
+  {u:5, q:"Which of these is a common Fault Tolerance technique?", opts:["Data replication","User authentication","Dynamic pricing","Data visualization"], correct:0, exp:"Data replication, backup systems, and redundant servers are common fault tolerance techniques."},
+  {u:5, q:"Which design consideration focuses on how easy software is to learn and use?", opts:["Performance","Usability","Security","Maintainability"], correct:1, exp:"Usability refers to how easy software is to learn, use, and understand."},
+  {u:5, q:"Response time, throughput, and processing speed are metrics used to measure:", opts:["Security","Performance","Usability","Maintainability"], correct:1, exp:"These are Performance metrics — how quickly and efficiently software processes data."},
+  {u:5, q:"Updating security patches and fixing bugs relate to which design consideration?", opts:["Maintainability","Scalability","Reliability","Fault Tolerance"], correct:0, exp:"Maintainability refers to how easily a system can be updated, repaired, and improved."},
+];
+
+let quizStarted = false;
+let currentQuiz = [];
+let score = 0;
+let answered = 0;
+
+function shuffleArr(arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+
+function startQuiz(){
+  quizStarted = true;
+  const val = document.getElementById('quizUnitFilter').value;
+  const pool = val==='all' ? quizBank : quizBank.filter(q=>String(q.u)===val);
+  currentQuiz = shuffleArr(pool);
+  score = 0; answered = 0;
+  document.getElementById('resultBox').classList.remove('show');
+  updateScoreDisplay();
+  renderQuiz();
+}
+
+function updateScoreDisplay(){
+  document.getElementById('quizScore').textContent = `Score: ${score} / ${answered}`;
+}
+
+function renderQuiz(){
+  const container = document.getElementById('quizContainer');
+  container.innerHTML = '';
+  currentQuiz.forEach((q, i)=>{
+    const card = document.createElement('div');
+    card.className = 'q-card';
+    card.innerHTML = `
+      <div class="q-num">Question ${i+1} · Unit ${q.u}</div>
+      <p class="q-text">${q.q}</p>
+      <div class="opts" id="opts-${i}"></div>
+      <div class="explain" id="exp-${i}">${q.exp}</div>
+    `;
+    container.appendChild(card);
+    const optsDiv = card.querySelector(`#opts-${i}`);
+    q.opts.forEach((opt, oi)=>{
+      const b = document.createElement('button');
+      b.className = 'opt';
+      b.textContent = opt;
+      b.onclick = ()=>selectAnswer(i, oi, b);
+      optsDiv.appendChild(b);
+    });
+  });
+}
+
+function selectAnswer(qIdx, optIdx, btnEl){
+  const q = currentQuiz[qIdx];
+  const optsDiv = document.getElementById(`opts-${qIdx}`);
+  const buttons = optsDiv.querySelectorAll('.opt');
+  if(optsDiv.dataset.answered) return;
+  optsDiv.dataset.answered = "true";
+  answered++;
+  if(optIdx === q.correct){
+    score++;
+    btnEl.classList.add('correct');
+  } else {
+    btnEl.classList.add('wrong');
+    buttons[q.correct].classList.add('correct');
+  }
+  buttons.forEach(b=>b.classList.add('disabled'));
+  document.getElementById(`exp-${qIdx}`).classList.add('show');
+  updateScoreDisplay();
+  if(answered === currentQuiz.length){ showResult(); }
+}
+
+function showResult(){
+  const pct = Math.round((score/currentQuiz.length)*100);
+  const box = document.getElementById('resultBox');
+  box.classList.add('show');
+  document.getElementById('resultScore').textContent = pct + '%';
+  let msg = '';
+  if(pct >= 80) msg = "Excellent! You've got this material solid. 🔥";
+  else if(pct >= 60) msg = "Good effort — review the units you missed and try again.";
+  else msg = "No wahala, go back to Notes/Flashcards and run it again — you'll improve.";
+  document.getElementById('resultMsg').textContent = `${score} out of ${currentQuiz.length} correct. ${msg}`;
+}
+</script>
+
+</body>
+</html>
